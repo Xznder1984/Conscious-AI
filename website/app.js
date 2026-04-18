@@ -2,17 +2,28 @@
 let modelsData = [];
 
 // API configuration - supports both local and deployed server
-const API_ENDPOINTS = {
-    local: 'http://localhost:3000/api/models',
-    deployed: 'https://neuron-models.vercel.app/api/models',
-    fallback: 'http://localhost:3000/api/models'
+const getAPIEndpoints = () => {
+    // Use environment variable if available
+    const envUrl = import.meta.env.VITE_API_URL;
+    
+    return {
+        primary: envUrl ? `${envUrl}/api/models` : 'http://localhost:3000/api/models',
+        local: 'http://localhost:3000/api/models',
+        deployed: 'https://neuron-models.vercel.app/api/models',
+        fallback: 'http://localhost:3000/api/models'
+    };
 };
 
 // Fetch models from API
 async function fetchModelsFromAPI() {
-    const endpoints = [API_ENDPOINTS.local, API_ENDPOINTS.deployed];
+    const endpoints = getAPIEndpoints();
+    const endpointList = [
+        endpoints.primary,
+        endpoints.local,
+        endpoints.deployed
+    ].filter((e, i, arr) => arr.indexOf(e) === i); // Remove duplicates
     
-    for (const endpoint of endpoints) {
+    for (const endpoint of endpointList) {
         try {
             console.log(`Attempting to fetch from: ${endpoint}`);
             const response = await fetch(endpoint);

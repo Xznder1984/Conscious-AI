@@ -3,7 +3,7 @@
   "outputDirectory": "website/dist",
   "framework": "vite",
   "env": {
-    "VITE_API_URL": "@VITE_API_URL"
+    "VITE_API_URL": "http://localhost:3000"
   },
   "rewrites": [
     {
