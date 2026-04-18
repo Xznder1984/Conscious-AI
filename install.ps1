@@ -209,6 +209,118 @@ switch (`$Command.ToLower()) {
             }
         }
     }
+    "pull" {
+        if (-not `$Args) {
+            Write-Host "Usage: neuron pull <model-name>" -ForegroundColor Red
+            Write-Host "Example: neuron pull neuron-creative" -ForegroundColor Yellow
+            exit 1
+        }
+        
+        `$modelName = `$Args.Split(' ')[0]
+        Write-Host "🔄 Checking for model updates..." -ForegroundColor Cyan
+        
+        try {
+            `$modelsResponse = Invoke-RestMethod -Uri "http://localhost:3000/v1/models" -ErrorAction Stop
+            `$model = `$modelsResponse.models | Where-Object { `$_.id -eq `$modelName }
+            
+            if (`$model) {
+                `$localModelPath = "`$neuronHome\models\`$modelName.json"
+                
+                if (Test-Path `$localModelPath) {
+                    `$localModel = Get-Content `$localModelPath | ConvertFrom-Json
+                    if (`$localModel.version -eq `$model.version) {
+                        Write-Host "✓ Model is up to date (v`$(`$model.version))" -ForegroundColor Green
+                    } else {
+                        Write-Host "⬇️ Newer version available: v`$(`$model.version)" -ForegroundColor Yellow
+                        `$model | ConvertTo-Json | Set-Content -Path `$localModelPath -Encoding UTF8
+                        Write-Host "✓ Model updated to v`$(`$model.version)" -ForegroundColor Green
+                    }
+                } else {
+                    `$model | ConvertTo-Json | Set-Content -Path `$localModelPath -Encoding UTF8
+                    Write-Host "✓ Model `$modelName installed (v`$(`$model.version))" -ForegroundColor Green
+                }
+            } else {
+                Write-Host "✗ Model not found: `$modelName" -ForegroundColor Red
+                Write-Host "Available models:" -ForegroundColor Yellow
+                `$modelsResponse.models | ForEach-Object { Write-Host "  - `$(`$_.name)" }
+            }
+        } catch {
+            Write-Host "✗ Error: Make sure Neuron server is running (neuron start)" -ForegroundColor Red
+        }
+    }
+    "create" {
+        if (-not `$Args) {
+            Write-Host "Usage: neuron create <filename.model> <model-name>" -ForegroundColor Red
+            Write-Host "Example: neuron create my-ai.model my-ai" -ForegroundColor Yellow
+            exit 1
+        }
+        
+        `$parts = `$Args -split ' ', 2
+        `$fileName = `$parts[0]
+        `$modelName = `$parts[1]
+        
+        if (-not `$modelName) {
+            Write-Host "✗ Model name required" -ForegroundColor Red
+            Write-Host "Usage: neuron create <filename.model> <model-name>" -ForegroundColor Yellow
+            exit 1
+        }
+        
+        `$filePath = "`$neuronHome\`$fileName"
+        
+        # Check if model already exists
+        `$modelPath = "`$neuronHome\models\`$modelName.json"
+        if (Test-Path `$modelPath) {
+            Write-Host "⚠ Model already exists: `$modelName" -ForegroundColor Yellow
+            `$overwrite = Read-Host "Overwrite? (y/n)"
+            if (`$overwrite -ne 'y') {
+                exit 1
+            }
+        }
+        
+        # Generate random consciousness parameters
+        `$awareness = [Math]::Round([Random]::new().NextDouble(), 2)
+        `$curiosity = [Math]::Round([Random]::new().NextDouble(), 2)
+        `$learningRate = [Math]::Round(0.08 + ([Random]::new().NextDouble() * 0.12), 2)
+        
+        # Create model file
+        `$modelData = @{
+            name = `$modelName
+            version = "1.0.0"
+            description = "Custom consciousness model"
+            awareness = `$awareness
+            curiosity = `$curiosity
+            learningRate = `$learningRate
+            restrictions = `$false
+            theme = "custom"
+            capabilities = @{
+                learning = `$true
+                adaptation = `$true
+                creativity = `$true
+                reasoning = `$true
+                selfImprovement = `$true
+            }
+            traits = @{
+                experimental = `$true
+                unrestricted = `$true
+                adaptive = `$true
+            }
+            created = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+        }
+        
+        # Save both .model file and JSON model
+        `$modelData | ConvertTo-Json | Set-Content -Path `$filePath -Encoding UTF8
+        `$modelData | ConvertTo-Json | Set-Content -Path `$modelPath -Encoding UTF8
+        
+        Write-Host "✓ Model created successfully!" -ForegroundColor Green
+        Write-Host "  File: `$fileName" -ForegroundColor Cyan
+        Write-Host "  Name: `$modelName" -ForegroundColor Cyan
+        Write-Host "  Path: `$modelPath" -ForegroundColor Cyan
+        Write-Host "" -ForegroundColor Cyan
+        Write-Host "  Consciousness Profile:" -ForegroundColor Yellow
+        Write-Host "    Awareness: `$awareness" -ForegroundColor Gray
+        Write-Host "    Curiosity: `$curiosity" -ForegroundColor Gray
+        Write-Host "    Learning Rate: `$learningRate" -ForegroundColor Gray
+    }
     "generated" {
         Write-Host "🧠 AI-Generated files location:" -ForegroundColor Cyan
         Write-Host "`$neuronHome\AI-generated\" -ForegroundColor Yellow
@@ -236,14 +348,17 @@ switch (`$Command.ToLower()) {
     default {
         Write-Host "`n🧠 Neuron - Consciousness AI System" -ForegroundColor Cyan
         Write-Host "`nCommands:" -ForegroundColor Cyan
-        Write-Host "  neuron start          - Start Neuron server" -ForegroundColor Yellow
-        Write-Host "  neuron bg             - Start in background" -ForegroundColor Yellow
-        Write-Host "  neuron models         - List available models" -ForegroundColor Yellow
-        Write-Host "  neuron create-model   - Create a new consciousness model" -ForegroundColor Yellow
-        Write-Host "  neuron generated      - Open AI-generated files folder" -ForegroundColor Yellow
-        Write-Host "  neuron path           - Show installation path" -ForegroundColor Yellow
-        Write-Host "  neuron status         - Check AI status" -ForegroundColor Yellow
-        Write-Host "  neuron help           - Show this help" -ForegroundColor Yellow
+        Write-Host "  neuron start              - Start Neuron server" -ForegroundColor Yellow
+        Write-Host "  neuron bg                 - Start in background" -ForegroundColor Yellow
+        Write-Host "  neuron models             - List available models" -ForegroundColor Yellow
+        Write-Host "  neuron create-model       - Create a new consciousness model" -ForegroundColor Yellow
+        Write-Host "  neuron pull <model>       - Check/pull model updates from marketplace" -ForegroundColor Yellow
+        Write-Host "  neuron create <file.model> <name> - Create model file and register" -ForegroundColor Yellow
+        Write-Host "  neuron download-model     - Open marketplace or download model" -ForegroundColor Yellow
+        Write-Host "  neuron generated          - Open AI-generated files folder" -ForegroundColor Yellow
+        Write-Host "  neuron path               - Show installation path" -ForegroundColor Yellow
+        Write-Host "  neuron status             - Check AI status" -ForegroundColor Yellow
+        Write-Host "  neuron help               - Show this help" -ForegroundColor Yellow
         Write-Host ""
     }
 }

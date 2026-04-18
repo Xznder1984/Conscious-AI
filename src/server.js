@@ -249,12 +249,42 @@ app.get('/v1/models', (req, res) => {
       const modelData = JSON.parse(fs.readFileSync(path.join(modelsPath, file), 'utf8'));
       return {
         id: path.basename(file, '.json'),
-        ...modelData
+        ...modelData,
+        lastUpdated: fs.statSync(path.join(modelsPath, file)).mtime
       };
     });
     res.json({ models });
   } catch (error) {
     res.json({ models: [], error: error.message });
+  }
+});
+
+// Check for model updates
+app.post('/v1/check-model-updates', (req, res) => {
+  const { modelName } = req.body;
+  const modelsPath = path.join(__dirname, '..', 'models');
+  
+  try {
+    const modelPath = path.join(modelsPath, `${modelName}.json`);
+    
+    if (fs.existsSync(modelPath)) {
+      const model = JSON.parse(fs.readFileSync(modelPath, 'utf8'));
+      const stats = fs.statSync(modelPath);
+      
+      res.json({
+        exists: true,
+        model: model,
+        lastUpdated: stats.mtime,
+        version: model.version
+      });
+    } else {
+      res.status(404).json({
+        exists: false,
+        error: `Model ${modelName} not found`
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -280,6 +310,23 @@ app.post('/v1/download-model', (req, res) => {
     } else {
       res.status(404).json({ error: `Model ${modelName} not found` });
     }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// List available models endpoint
+app.get('/v1/list-models', (req, res) => {
+  const modelsPath = path.join(__dirname, '..', 'models');
+  try {
+    const modelFiles = fs.readdirSync(modelsPath)
+      .filter(f => f.endsWith('.json'))
+      .map(file => path.basename(file, '.json'));
+    
+    res.json({
+      models: modelFiles,
+      count: modelFiles.length
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
