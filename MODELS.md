@@ -107,6 +107,36 @@ Or:
 ✓ Model updated to v1.0.1
 ```
 
+### Backup and Restore Models
+
+```powershell
+# Backup a model before making changes
+neuron backup neuron-creative
+
+# List available backups
+neuron restore
+
+# Restore from a backup
+neuron restore neuron-creative_2026-04-18T12-30-45.backup.json
+```
+
+Backups are automatically timestamped and stored in the `backups/` directory.
+
+### Community Model Ratings
+
+```powershell
+# Rate a model (1-5 stars with optional comment)
+neuron rate neuron-creative 5 "Amazing AI!"
+
+# View ratings for a specific model
+neuron ratings neuron-creative
+
+# View all model ratings
+neuron ratings all
+```
+
+Models can be rated from 1-5 stars by the community. Average ratings help users find the best models.
+
 ### List Available Models
 
 ```powershell

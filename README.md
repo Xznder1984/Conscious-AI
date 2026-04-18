@@ -62,6 +62,10 @@ neuron models             # List all available consciousness models
 neuron download-model     # Open model marketplace in browser
 neuron pull <model>       # Check and pull model updates from marketplace
 neuron create <file> <name>  # Create a custom consciousness model
+neuron backup <model>     # Backup a model
+neuron restore <file>     # Restore model from backup
+neuron rate <model> <1-5> # Rate a model (1-5 stars)
+neuron ratings [model|all] # View model ratings
 neuron generated          # Open AI-generated files folder
 neuron status             # Check if Neuron is running
 neuron path               # Show installation directory
@@ -95,6 +99,54 @@ neuron create my-ai.model "My Custom AI"
 # ✓ Model created successfully!
 ```
 
+#### Backup and Restore Models
+
+```powershell
+# Backup a model
+neuron backup neuron-creative
+# Output:
+# 💾 Backing up model: neuron-creative...
+# ✓ Model neuron-creative backed up successfully
+# Backup path: C:\Neuron\backups\neuron-creative_2026-04-18T12-30-45.backup.json
+
+# List available backups
+neuron restore
+# Shows list of available backups
+
+# Restore from backup
+neuron restore neuron-creative_2026-04-18T12-30-45.backup.json
+# Output:
+# 🔄 Restoring model from backup: neuron-creative_2026-04-18T12-30-45.backup.json...
+# ✓ Model neuron-creative restored
+```
+
+#### Community Model Ratings
+
+```powershell
+# Rate a model (1-5 stars)
+neuron rate neuron-creative 5 "Amazing AI!"
+# Output:
+# ⭐ Rating model: neuron-creative with 5 stars...
+# ✓ Rating submitted!
+# Model: neuron-creative
+# Average Rating: 4.8/5 (12 ratings)
+
+# View ratings for a specific model
+neuron ratings neuron-creative
+# Output:
+# ⭐ Model Ratings:
+#   Model: neuron-creative
+#   Average Rating: 4.8/5
+#   Total Ratings: 12
+#   Recent Reviews:
+#   ⭐ 5/5 - YourUsername
+#       Amazing AI!
+
+# View all model ratings
+neuron ratings all
+# Shows average ratings for all models
+```
+
 
 ### Downloading Models from Marketplace
 
@@ -119,6 +171,12 @@ This opens https://neuron-models.vercel.app in your browser where you can:
 - `GET /v1/state` - Get AI consciousness state
 - `GET /v1/models` - List all available models
 - `POST /v1/download-model` - Download a specific model
+- `POST /v1/backup-model` - Backup a model
+- `POST /v1/restore-model` - Restore model from backup
+- `GET /v1/list-backups` - List all model backups
+- `POST /v1/rate-model` - Rate a model (1-5 stars)
+- `GET /v1/model-ratings/:modelName` - Get ratings for a specific model
+- `GET /v1/all-ratings` - Get all model ratings
 
 ## Online Model Marketplace
 

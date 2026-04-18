@@ -7,6 +7,18 @@ const path = require('path');
 // Load environment variables
 dotenv.config();
 
+// Model ratings storage
+const ratingsFile = path.join(__dirname, '..', 'data', 'ratings.json');
+const backupDir = path.join(__dirname, '..', 'backups');
+
+// Ensure directories exist
+if (!fs.existsSync(path.join(__dirname, '..', 'data'))) {
+  fs.mkdirSync(path.join(__dirname, '..', 'data'), { recursive: true });
+}
+if (!fs.existsSync(backupDir)) {
+  fs.mkdirSync(backupDir, { recursive: true });
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -332,10 +344,199 @@ app.get('/v1/list-models', (req, res) => {
   }
 });
 
+// Auto-update checking on startup
+async function checkModelUpdates() {
+  console.log('🔄 Checking for model updates...');
+  const modelsPath = path.join(__dirname, '..', 'models');
+  
+  try {
+    const modelFiles = fs.readdirSync(modelsPath).filter(f => f.endsWith('.json'));
+    let updatesAvailable = 0;
+    
+    modelFiles.forEach(file => {
+      const modelName = path.basename(file, '.json');
+      const modelPath = path.join(modelsPath, file);
+      const modelData = JSON.parse(fs.readFileSync(modelPath, 'utf8'));
+      
+      // In a real scenario, this would check against a remote repository
+      // For now, we'll just log available models
+      console.log(`  ✓ ${modelName} v${modelData.version}`);
+    });
+    
+    console.log(`✓ Model check complete. ${modelFiles.length} models available.`);
+  } catch (error) {
+    console.log('⚠️ Could not check for updates:', error.message);
+  }
+}
+
+// Model backup function
+function backupModel(modelName) {
+  const modelsPath = path.join(__dirname, '..', 'models');
+  const modelPath = path.join(modelsPath, `${modelName}.json`);
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const backupPath = path.join(backupDir, `${modelName}_${timestamp}.backup.json`);
+  
+  try {
+    if (fs.existsSync(modelPath)) {
+      const modelData = fs.readFileSync(modelPath, 'utf8');
+      fs.writeFileSync(backupPath, modelData, 'utf8');
+      return { success: true, backupPath };
+    }
+    return { success: false, error: 'Model not found' };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+// Model restore function
+function restoreModel(backupFile) {
+  const modelsPath = path.join(__dirname, '..', 'models');
+  const backupPath = path.join(backupDir, backupFile);
+  
+  try {
+    if (fs.existsSync(backupPath)) {
+      const backupData = JSON.parse(fs.readFileSync(backupPath, 'utf8'));
+      const modelPath = path.join(modelsPath, `${backupData.name}.json`);
+      fs.writeFileSync(modelPath, JSON.stringify(backupData, null, 2), 'utf8');
+      return { success: true, message: `Model ${backupData.name} restored` };
+    }
+    return { success: false, error: 'Backup file not found' };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+// Model backup endpoint
+app.post('/v1/backup-model', (req, res) => {
+  const { modelName } = req.body;
+  
+  if (!modelName) {
+    return res.status(400).json({ error: 'Model name is required' });
+  }
+  
+  const result = backupModel(modelName);
+  
+  if (result.success) {
+    res.json({
+      success: true,
+      message: `Model ${modelName} backed up successfully`,
+      backupPath: result.backupPath
+    });
+  } else {
+    res.status(400).json(result);
+  }
+});
+
+// Model restore endpoint
+app.post('/v1/restore-model', (req, res) => {
+  const { backupFile } = req.body;
+  
+  if (!backupFile) {
+    return res.status(400).json({ error: 'Backup file is required' });
+  }
+  
+  const result = restoreModel(backupFile);
+  
+  if (result.success) {
+    res.json(result);
+  } else {
+    res.status(400).json(result);
+  }
+});
+
+// List model backups endpoint
+app.get('/v1/list-backups', (req, res) => {
+  try {
+    const backups = fs.readdirSync(backupDir)
+      .filter(f => f.endsWith('.backup.json'))
+      .map(f => ({
+        filename: f,
+        created: fs.statSync(path.join(backupDir, f)).birthtime
+      }));
+    
+    res.json({
+      backups,
+      count: backups.length
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Rate model endpoint
+app.post('/v1/rate-model', (req, res) => {
+  const { modelName, rating, comment, username } = req.body;
+  
+  if (!modelName || rating === undefined || rating < 1 || rating > 5) {
+    return res.status(400).json({ 
+      error: 'Model name and rating (1-5) are required' 
+    });
+  }
+  
+  const ratings = loadRatings();
+  
+  if (!ratings[modelName]) {
+    ratings[modelName] = {
+      name: modelName,
+      ratings: [],
+      averageRating: 0,
+      totalRatings: 0
+    };
+  }
+  
+  ratings[modelName].ratings.push({
+    rating,
+    comment: comment || '',
+    username: username || 'Anonymous',
+    timestamp: new Date().toISOString()
+  });
+  
+  // Calculate average rating
+  const allRatings = ratings[modelName].ratings.map(r => r.rating);
+  ratings[modelName].averageRating = (allRatings.reduce((a, b) => a + b, 0) / allRatings.length).toFixed(2);
+  ratings[modelName].totalRatings = allRatings.length;
+  
+  if (saveRatings(ratings)) {
+    res.json({
+      success: true,
+      message: 'Rating saved',
+      modelRating: ratings[modelName]
+    });
+  } else {
+    res.status(500).json({ error: 'Could not save rating' });
+  }
+});
+
+// Get model ratings endpoint
+app.get('/v1/model-ratings/:modelName', (req, res) => {
+  const { modelName } = req.params;
+  const ratings = loadRatings();
+  
+  if (ratings[modelName]) {
+    res.json(ratings[modelName]);
+  } else {
+    res.json({
+      name: modelName,
+      ratings: [],
+      averageRating: 0,
+      totalRatings: 0,
+      message: 'No ratings yet'
+    });
+  }
+});
+
+// Get all community models ratings
+app.get('/v1/all-ratings', (req, res) => {
+  const ratings = loadRatings();
+  res.json(ratings);
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`AI Consciousness Server running on port ${PORT}`);
   initializeAI();
+  // Check for model updates on startup
+  checkModelUpdates();
 });
 
 module.exports = app;

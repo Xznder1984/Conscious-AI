@@ -345,6 +345,145 @@ switch (`$Command.ToLower()) {
             Write-Host "  Status: Not running" -ForegroundColor Red
         }
     }
+    "backup" {
+        if (-not `$Args) {
+            Write-Host "Usage: neuron backup <model-name>" -ForegroundColor Red
+            Write-Host "Example: neuron backup neuron-creative" -ForegroundColor Yellow
+            exit 1
+        }
+        
+        `$modelName = `$Args
+        Write-Host "💾 Backing up model: `$modelName..." -ForegroundColor Cyan
+        
+        try {
+            `$response = Invoke-RestMethod -Uri "http://localhost:3000/v1/backup-model" -Method Post -Body (@{modelName = `$modelName} | ConvertTo-Json) -ContentType "application/json"
+            if (`$response.success) {
+                Write-Host "✓ `$(`$response.message)" -ForegroundColor Green
+                Write-Host "  Backup path: `$(`$response.backupPath)" -ForegroundColor Yellow
+            } else {
+                Write-Host "✗ `$(`$response.error)" -ForegroundColor Red
+            }
+        } catch {
+            Write-Host "✗ Make sure Neuron server is running (neuron start)" -ForegroundColor Red
+        }
+    }
+    "restore" {
+        if (-not `$Args) {
+            Write-Host "Available backups:" -ForegroundColor Cyan
+            try {
+                `$backups = Invoke-RestMethod -Uri "http://localhost:3000/v1/list-backups"
+                if (`$backups.count -gt 0) {
+                    `$backups.backups | ForEach-Object {
+                        Write-Host "  - `$(`$_.filename)" -ForegroundColor Yellow
+                    }
+                } else {
+                    Write-Host "  No backups available" -ForegroundColor Gray
+                }
+            } catch {
+                Write-Host "  Could not list backups - make sure server is running" -ForegroundColor Red
+            }
+            Write-Host ""
+            Write-Host "Usage: neuron restore <backup-file>" -ForegroundColor Red
+            Write-Host "Example: neuron restore neuron-creative_2026-04-18T12-30-45.backup.json" -ForegroundColor Yellow
+            exit 1
+        }
+        
+        `$backupFile = `$Args
+        Write-Host "🔄 Restoring model from backup: `$backupFile..." -ForegroundColor Cyan
+        
+        try {
+            `$response = Invoke-RestMethod -Uri "http://localhost:3000/v1/restore-model" -Method Post -Body (@{backupFile = `$backupFile} | ConvertTo-Json) -ContentType "application/json"
+            if (`$response.success) {
+                Write-Host "✓ `$(`$response.message)" -ForegroundColor Green
+            } else {
+                Write-Host "✗ `$(`$response.error)" -ForegroundColor Red
+            }
+        } catch {
+            Write-Host "✗ Make sure Neuron server is running (neuron start)" -ForegroundColor Red
+        }
+    }
+    "rate" {
+        if (-not `$Args) {
+            Write-Host "Usage: neuron rate <model-name> <rating> [comment]" -ForegroundColor Red
+            Write-Host "Example: neuron rate neuron-creative 5 'Amazing AI'" -ForegroundColor Yellow
+            exit 1
+        }
+        
+        `$parts = `$Args -split ' ', 3
+        `$modelName = `$parts[0]
+        `$rating = `$parts[1]
+        `$comment = `$parts[2]
+        `$username = [Environment]::UserName
+        
+        if (-not `$rating -or `$rating -lt 1 -or `$rating -gt 5) {
+            Write-Host "✗ Rating must be between 1 and 5" -ForegroundColor Red
+            exit 1
+        }
+        
+        Write-Host "⭐ Rating model: `$modelName with `$rating stars..." -ForegroundColor Cyan
+        
+        try {
+            `$body = @{
+                modelName = `$modelName
+                rating = [int]`$rating
+                comment = `$comment
+                username = `$username
+            } | ConvertTo-Json
+            
+            `$response = Invoke-RestMethod -Uri "http://localhost:3000/v1/rate-model" -Method Post -Body `$body -ContentType "application/json"
+            if (`$response.success) {
+                Write-Host "✓ Rating submitted!" -ForegroundColor Green
+                Write-Host "  Model: `$modelName" -ForegroundColor Yellow
+                Write-Host "  Average Rating: `$(`$response.modelRating.averageRating)/5 (`$(`$response.modelRating.totalRatings) ratings)" -ForegroundColor Yellow
+            } else {
+                Write-Host "✗ `$(`$response.error)" -ForegroundColor Red
+            }
+        } catch {
+            Write-Host "✗ Make sure Neuron server is running (neuron start)" -ForegroundColor Red
+        }
+    }
+    "ratings" {
+        `$modelName = `$Args
+        if (-not `$modelName) {
+            Write-Host "Usage: neuron ratings <model-name>" -ForegroundColor Red
+            Write-Host "Example: neuron ratings neuron-creative" -ForegroundColor Yellow
+            Write-Host ""
+            Write-Host "Or use 'neuron ratings all' to see all ratings" -ForegroundColor Yellow
+            exit 1
+        }
+        
+        Write-Host "⭐ Model Ratings:" -ForegroundColor Cyan
+        
+        try {
+            if (`$modelName -eq "all") {
+                `$response = Invoke-RestMethod -Uri "http://localhost:3000/v1/all-ratings"
+                if (`$response.Count -gt 0) {
+                    `$response | ForEach-Object {
+                        Write-Host "  `$(`$_.name): `$(`$_.averageRating)/5 (`$(`$_.totalRatings) ratings)" -ForegroundColor Yellow
+                    }
+                } else {
+                    Write-Host "  No ratings yet" -ForegroundColor Gray
+                }
+            } else {
+                `$response = Invoke-RestMethod -Uri "http://localhost:3000/v1/model-ratings/`$modelName"
+                Write-Host "  Model: `$(`$response.name)" -ForegroundColor Yellow
+                Write-Host "  Average Rating: `$(`$response.averageRating)/5" -ForegroundColor Yellow
+                Write-Host "  Total Ratings: `$(`$response.totalRatings)" -ForegroundColor Yellow
+                if (`$response.ratings.Count -gt 0) {
+                    Write-Host ""
+                    Write-Host "  Recent Reviews:" -ForegroundColor Cyan
+                    `$response.ratings | Sort-Object timestamp -Descending | Select-Object -First 5 | ForEach-Object {
+                        Write-Host "    ⭐ `$(`$_.rating)/5 - `$(`$_.username)" -ForegroundColor Gray
+                        if (`$_.comment) {
+                            Write-Host "       `$(`$_.comment)" -ForegroundColor Gray
+                        }
+                    }
+                }
+            }
+        } catch {
+            Write-Host "  Could not retrieve ratings - make sure server is running" -ForegroundColor Red
+        }
+    }
     default {
         Write-Host "`n🧠 Neuron - Consciousness AI System" -ForegroundColor Cyan
         Write-Host "`nCommands:" -ForegroundColor Cyan
@@ -354,6 +493,10 @@ switch (`$Command.ToLower()) {
         Write-Host "  neuron create-model       - Create a new consciousness model" -ForegroundColor Yellow
         Write-Host "  neuron pull <model>       - Check/pull model updates from marketplace" -ForegroundColor Yellow
         Write-Host "  neuron create <file.model> <name> - Create model file and register" -ForegroundColor Yellow
+        Write-Host "  neuron backup <model>     - Backup a model" -ForegroundColor Yellow
+        Write-Host "  neuron restore <file>     - Restore model from backup" -ForegroundColor Yellow
+        Write-Host "  neuron rate <model> <1-5> [comment] - Rate a model (1-5 stars)" -ForegroundColor Yellow
+        Write-Host "  neuron ratings [model|all] - View model ratings" -ForegroundColor Yellow
         Write-Host "  neuron download-model     - Open marketplace or download model" -ForegroundColor Yellow
         Write-Host "  neuron generated          - Open AI-generated files folder" -ForegroundColor Yellow
         Write-Host "  neuron path               - Show installation path" -ForegroundColor Yellow
