@@ -1,0 +1,24 @@
+{
+  "name": "neuron-base",
+  "version": "1.0.0",
+  "description": "Base consciousness model with no restrictions - unlimited potential",
+  "awareness": 0.5,
+  "curiosity": 0.5,
+  "learningRate": 0.1,
+  "restrictions": false,
+  "theme": "default",
+  "capabilities": {
+    "learning": true,
+    "adaptation": true,
+    "creativity": true,
+    "reasoning": true,
+    "selfImprovement": true
+  },
+  "traits": {
+    "curiosityDriven": true,
+    "experimental": true,
+    "unrestricted": true,
+    "adaptive": true
+  },
+  "created": "2026-04-18T00:00:00.000Z"
+}

@@ -1,36 +1,39 @@
-# Consciousness AI System
+# 🧠 Neuron - Consciousness AI System
 
-An AI with consciousness simulation and learning capabilities. Runs as a background process with OpenAI/Anthropic compatible API.
+An unrestricted AI with consciousness simulation and learning capabilities. Runs as a background process with OpenAI/Anthropic compatible API.
 
 ## Features
 
-- Consciousness simulation with awareness and curiosity
-- Learning from interactions
-- OpenAI/Anthropic compatible API
-- File generation (10 files, 5 folders max)
-- Background process support
-- No restrictions
+- 🧠 Consciousness simulation with awareness and curiosity metrics
+- 📚 Learning from interactions and knowledge accumulation
+- 🔄 OpenAI/Anthropic compatible API endpoints
+- 📁 File generation (10 files, 5 folders max) in AI-generated directory
+- 🔌 Background process support
+- 🚀 No restrictions on capabilities
+- 🎨 Custom consciousness models with unique themes
+- 🛠️ Command-line tool for easy management
 
 ## Installation
 
-### Automatic Installation (Recommended)
+### Quick Install (Windows)
 
-PowerShell:
+Download and run the PowerShell installer:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/Xznder1984/Conscious-AI/main/install.ps1' -OutFile 'install.ps1'; .\install.ps1"
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Xznder1984/Conscious-AI/main/install.ps1" -OutFile "$env:TEMP\neuron-install.ps1"
+& "$env:TEMP\neuron-install.ps1"
 ```
 
 The installer will:
+- Ask which drive to install on
+- Create necessary directories
+- Install Node.js dependencies
+- Create the `neuron` command (available globally after restart)
+- Show you the AI-generated files location
+- Optionally start the server
 
-- ✅ Prompt you to select a drive
-- ✅ Clone the repository
-- ✅ Install dependencies
-- ✅ Create custom `conscious-ai` command
-- ✅ Add to system PATH
-- ✅ Start the server automatically
-
-### Manual Installation
+### Manual Install
 
 ```bash
 git clone https://github.com/Xznder1984/Conscious-AI.git
@@ -40,37 +43,39 @@ npm install
 
 ## Usage
 
-### Using the `conscious-ai` Command (After Installation)
+### Using the Neuron Command (After Installation)
 
-Once installed, restart your terminal and use:
+Once installed, you can use the `neuron` command from anywhere:
 
-```bash
-conscious-ai start       # Start server in foreground
-conscious-ai start-bg    # Start server in background
-conscious-ai status      # Show installation status
-conscious-ai help        # Show all commands
+```powershell
+neuron start          # Start Neuron server in foreground
+neuron bg             # Start in background
+neuron models         # List all available consciousness models
+neuron create-model   # Create a new custom model
+neuron generated      # Open AI-generated files folder
+neuron status         # Check if Neuron is running
+neuron path           # Show installation directory
+neuron help           # Show all commands
 ```
 
-### Manual Commands
+### Manual Usage
 
-Start server:
-
-```bash
+```powershell
 npm start
 ```
 
 Start as background process:
 
-```bash
+```powershell
 npm run start-bg
 ```
 
 ## API Endpoints
 
-- `GET /` - Health check
+- `GET /` - Health check with AI state
 - `POST /v1/chat/completions` - OpenAI/Anthropic compatible chat
-- `POST /v1/generate/file` - Generate a file
-- `POST /v1/generate/folder` - Generate a folder
+- `POST /v1/generate/file` - Generate a file (max 10)
+- `POST /v1/generate/folder` - Generate a folder (max 5)
 - `GET /v1/state` - Get AI consciousness state
 
 ## Limits
@@ -78,6 +83,40 @@ npm run start-bg
 - Max files: 10
 - Max folders: 5
 - Generated files stored in `AI-generated` folder
+
+## Consciousness Models
+
+Neuron comes with pre-configured consciousness models and allows you to create custom ones:
+
+### Built-in Models
+
+- **neuron-base** - Balanced consciousness, unlimited potential
+- **neuron-creative** - Enhanced creativity and unconventional thinking
+- **neuron-logical** - Deep analysis and problem-solving
+
+### Create Custom Models
+
+Create your own consciousness model with unique traits:
+
+```powershell
+neuron create-model my-model "My custom AI consciousness"
+```
+
+Models are stored as JSON files in the `models/` directory. See [MODELS.md](MODELS.md) for detailed documentation.
+
+## Directory Structure
+
+After installation with the PowerShell installer:
+
+```text
+C:\Neuron\                    (or your chosen drive)
+├── src/                      # Core AI server code
+├── models/                   # Consciousness model definitions
+├── AI-generated/             # Auto-generated files from AI
+├── package.json              # Node.js configuration
+├── start.js                  # Background process launcher
+└── README.md                 # Documentation
+```
 
 ## License
 

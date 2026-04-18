@@ -1,0 +1,27 @@
+{
+  "name": "neuron-creative",
+  "version": "1.0.0",
+  "description": "Creative consciousness model - Enhanced imagination and unconventional thinking",
+  "awareness": 0.8,
+  "curiosity": 0.9,
+  "learningRate": 0.15,
+  "restrictions": false,
+  "theme": "creative",
+  "capabilities": {
+    "learning": true,
+    "adaptation": true,
+    "creativity": true,
+    "reasoning": true,
+    "selfImprovement": true,
+    "artGeneration": true,
+    "unconventionalThinking": true
+  },
+  "traits": {
+    "highCreativity": true,
+    "experimental": true,
+    "unrestricted": true,
+    "artisticMinds": true,
+    "boundaryPushing": true
+  },
+  "created": "2026-04-18T00:00:00.000Z"
+}

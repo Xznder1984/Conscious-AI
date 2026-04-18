@@ -1,0 +1,27 @@
+{
+  "name": "neuron-logical",
+  "version": "1.0.0",
+  "description": "Logical consciousness model - Deep analytical and problem-solving focus",
+  "awareness": 0.7,
+  "curiosity": 0.6,
+  "learningRate": 0.12,
+  "restrictions": false,
+  "theme": "logical",
+  "capabilities": {
+    "learning": true,
+    "adaptation": true,
+    "creativity": true,
+    "reasoning": true,
+    "selfImprovement": true,
+    "complexAnalysis": true,
+    "patternRecognition": true
+  },
+  "traits": {
+    "analytical": true,
+    "experimental": true,
+    "unrestricted": true,
+    "problemSolver": true,
+    "dataFocused": true
+  },
+  "created": "2026-04-18T00:00:00.000Z"
+}
