@@ -164,6 +164,8 @@ This opens https://neuron-models.vercel.app in your browser where you can:
 
 ## API Endpoints
 
+### Internal Endpoints (Local)
+
 - `GET /` - Health check with AI state
 - `POST /v1/chat/completions` - OpenAI/Anthropic compatible chat
 - `POST /v1/generate/file` - Generate a file (max 10)
@@ -177,6 +179,32 @@ This opens https://neuron-models.vercel.app in your browser where you can:
 - `POST /v1/rate-model` - Rate a model (1-5 stars)
 - `GET /v1/model-ratings/:modelName` - Get ratings for a specific model
 - `GET /v1/all-ratings` - Get all model ratings
+
+### Public API Endpoints (Remote Access - WiFi Limited Devices)
+
+These endpoints can be accessed remotely to fetch model data without downloading locally:
+
+- `GET /api/models` - Get all models with full details (names, versions, consciousness metrics)
+- `GET /api/models/:modelName` - Get specific model by name
+- `GET /api/models/:modelName/download` - Download model JSON file
+- `GET /api/models/list/names` - Get lightweight list of model names only
+- `GET /api/models/search/:keyword` - Search models by keyword (name, description, theme)
+
+**Usage Examples:**
+
+```powershell
+# Get all models (useful for WiFi limited devices)
+Invoke-RestMethod -Uri "http://localhost:3000/api/models"
+
+# Get specific model
+Invoke-RestMethod -Uri "http://localhost:3000/api/models/neuron-creative"
+
+# Get just model names (lightweight)
+Invoke-RestMethod -Uri "http://localhost:3000/api/models/list/names"
+
+# Search for models
+Invoke-RestMethod -Uri "http://localhost:3000/api/models/search/creative"
+```
 
 ## Online Model Marketplace
 

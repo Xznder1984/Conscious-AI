@@ -327,6 +327,162 @@ app.post('/v1/download-model', (req, res) => {
   }
 });
 
+// Public API: Get all models (no auth - for remote access)
+app.get('/api/models', (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  const modelsPath = path.join(__dirname, '..', 'models');
+  try {
+    const modelFiles = fs.readdirSync(modelsPath).filter(f => f.endsWith('.json'));
+    const models = modelFiles.map(file => {
+      const modelData = JSON.parse(fs.readFileSync(path.join(modelsPath, file), 'utf8'));
+      return {
+        id: path.basename(file, '.json'),
+        name: modelData.name,
+        version: modelData.version,
+        description: modelData.description || 'No description',
+        awareness: modelData.awareness,
+        curiosity: modelData.curiosity,
+        learningRate: modelData.learningRate,
+        theme: modelData.theme,
+        restrictions: modelData.restrictions,
+        created: modelData.created
+      };
+    });
+    
+    res.json({
+      success: true,
+      total: models.length,
+      models: models,
+      timestamp: new Date().toISOString(),
+      apiVersion: '1.0.0'
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+});
+
+// Public API: Get single model by name (no auth - for remote access)
+app.get('/api/models/:modelName', (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  const { modelName } = req.params;
+  const modelsPath = path.join(__dirname, '..', 'models');
+  const modelPath = path.join(modelsPath, `${modelName}.json`);
+  
+  try {
+    if (fs.existsSync(modelPath)) {
+      const modelData = JSON.parse(fs.readFileSync(modelPath, 'utf8'));
+      res.json({
+        success: true,
+        model: modelData,
+        downloadUrl: `/api/models/${modelName}/download`,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      res.status(404).json({ 
+        success: false,
+        error: `Model ${modelName} not found` 
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+});
+
+// Public API: Download model file (no auth - for remote access)
+app.get('/api/models/:modelName/download', (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  const { modelName } = req.params;
+  const modelsPath = path.join(__dirname, '..', 'models');
+  const modelPath = path.join(modelsPath, `${modelName}.json`);
+  
+  try {
+    if (fs.existsSync(modelPath)) {
+      const modelData = fs.readFileSync(modelPath, 'utf8');
+      res.setHeader('Content-Disposition', `attachment; filename="${modelName}.json"`);
+      res.setHeader('Content-Type', 'application/json');
+      res.send(modelData);
+    } else {
+      res.status(404).json({ 
+        success: false,
+        error: `Model ${modelName} not found` 
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+});
+
+// Public API: Get model names only (lightweight - for WiFi limited devices)
+app.get('/api/models/list/names', (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  const modelsPath = path.join(__dirname, '..', 'models');
+  try {
+    const modelFiles = fs.readdirSync(modelsPath)
+      .filter(f => f.endsWith('.json'))
+      .map(file => path.basename(file, '.json'));
+    
+    res.json({
+      success: true,
+      total: modelFiles.length,
+      names: modelFiles,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+});
+
+// Public API: Search models by keyword
+app.get('/api/models/search/:keyword', (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  const { keyword } = req.params;
+  const modelsPath = path.join(__dirname, '..', 'models');
+  try {
+    const modelFiles = fs.readdirSync(modelsPath).filter(f => f.endsWith('.json'));
+    const models = modelFiles
+      .map(file => {
+        const modelData = JSON.parse(fs.readFileSync(path.join(modelsPath, file), 'utf8'));
+        return {
+          id: path.basename(file, '.json'),
+          name: modelData.name,
+          version: modelData.version,
+          description: modelData.description || 'No description',
+          theme: modelData.theme
+        };
+      })
+      .filter(m => 
+        m.id.toLowerCase().includes(keyword.toLowerCase()) ||
+        m.name.toLowerCase().includes(keyword.toLowerCase()) ||
+        m.description.toLowerCase().includes(keyword.toLowerCase())
+      );
+    
+    res.json({
+      success: true,
+      keyword: keyword,
+      found: models.length,
+      models: models,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+});
+
 // List available models endpoint
 app.get('/v1/list-models', (req, res) => {
   const modelsPath = path.join(__dirname, '..', 'models');
