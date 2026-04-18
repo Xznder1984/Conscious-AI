@@ -2,6 +2,12 @@
 
 An unrestricted AI with consciousness simulation and learning capabilities. Runs as a background process with OpenAI/Anthropic compatible API.
 
+## 🌐 Model Marketplace
+
+**Visit: https://neuron-models.vercel.app**
+
+Browse and download consciousness models directly from our beautiful online marketplace. Search, filter, and install models with a single command!
+
 ## Features
 
 - 🧠 Consciousness simulation with awareness and curiosity metrics
@@ -12,6 +18,8 @@ An unrestricted AI with consciousness simulation and learning capabilities. Runs
 - 🚀 No restrictions on capabilities
 - 🎨 Custom consciousness models with unique themes
 - 🛠️ Command-line tool for easy management
+- 🌐 Online model marketplace with beautiful UI
+- 📥 One-click model installation
 
 ## Installation
 
@@ -48,27 +56,30 @@ npm install
 Once installed, you can use the `neuron` command from anywhere:
 
 ```powershell
-neuron start          # Start Neuron server in foreground
-neuron bg             # Start in background
-neuron models         # List all available consciousness models
-neuron create-model   # Create a new custom model
-neuron generated      # Open AI-generated files folder
-neuron status         # Check if Neuron is running
-neuron path           # Show installation directory
-neuron help           # Show all commands
+neuron start              # Start Neuron server in foreground
+neuron bg                 # Start in background
+neuron models             # List all available consciousness models
+neuron download-model     # Open model marketplace in browser
+neuron create-model       # Create a new custom model
+neuron generated          # Open AI-generated files folder
+neuron status             # Check if Neuron is running
+neuron path               # Show installation directory
+neuron help               # Show all commands
 ```
 
-### Manual Usage
+### Downloading Models from Marketplace
 
+**Open the marketplace:**
 ```powershell
-npm start
+neuron download-model
 ```
 
-Start as background process:
-
-```powershell
-npm run start-bg
-```
+This opens https://neuron-models.vercel.app in your browser where you can:
+- 🔍 Browse all available models
+- 🏷️ Filter by type (official/community)
+- 📊 View consciousness profiles
+- 📥 Copy installation commands
+- 🎯 Search by name or tags
 
 ## API Endpoints
 
@@ -77,6 +88,24 @@ npm run start-bg
 - `POST /v1/generate/file` - Generate a file (max 10)
 - `POST /v1/generate/folder` - Generate a folder (max 5)
 - `GET /v1/state` - Get AI consciousness state
+- `GET /v1/models` - List all available models
+- `POST /v1/download-model` - Download a specific model
+
+## Online Model Marketplace
+
+🌐 **Website:** https://neuron-models.vercel.app
+
+Features:
+- Browse all consciousness models
+- Professional marketplace UI with dark theme
+- Search and filter models
+- View detailed model profiles
+- One-click installation
+- Community and official models
+- Model ratings and download counts
+- Consciousness stat visualization
+
+The website is automatically deployed and updated whenever new models are added to the repository.
 
 ## Limits
 
