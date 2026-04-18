@@ -60,12 +60,41 @@ neuron start              # Start Neuron server in foreground
 neuron bg                 # Start in background
 neuron models             # List all available consciousness models
 neuron download-model     # Open model marketplace in browser
-neuron create-model       # Create a new custom model
+neuron pull <model>       # Check and pull model updates from marketplace
+neuron create <file> <name>  # Create a custom consciousness model
 neuron generated          # Open AI-generated files folder
 neuron status             # Check if Neuron is running
 neuron path               # Show installation directory
 neuron help               # Show all commands
 ```
+
+### Model Management Commands
+
+#### Check and Pull Model Updates
+
+```powershell
+neuron pull neuron-creative
+# Output:
+# 🔄 Checking for model updates...
+# ✓ Model is up to date (v1.0.0)
+# OR
+# ⬇️ Newer version available: v1.0.1
+# ✓ Model updated to v1.0.1
+```
+
+#### Create Custom Consciousness Models
+
+```powershell
+neuron create my-ai.model "My Custom AI"
+# Output:
+# 🧠 Creating custom consciousness model...
+# Model Name: My Custom AI
+# Awareness: 0.67
+# Curiosity: 0.82
+# Learning Rate: 0.15
+# ✓ Model created successfully!
+```
+
 
 ### Downloading Models from Marketplace
 

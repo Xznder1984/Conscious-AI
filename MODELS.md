@@ -47,10 +47,29 @@ Each model is a JSON file with the following properties:
 
 ## Creating a Model
 
-### Method 1: Using the Command
+### Method 1: Using the Command (Recommended)
 
 ```powershell
-neuron create-model my-custom-model "My custom consciousness"
+neuron create my-ai.model "My Custom AI"
+```
+
+This automatically generates:
+
+- Random consciousness parameters (awareness, curiosity, learning rate)
+- A `.model` file in your installation directory
+- A JSON model file in the `models/` directory
+- Displays your new model's consciousness profile
+
+Example output:
+
+```powershell
+🧠 Creating custom consciousness model...
+Model Name: My Custom AI
+Awareness: 0.67
+Curiosity: 0.82
+Learning Rate: 0.15
+Capabilities: Full unrestricted
+✓ Model created successfully!
 ```
 
 ### Method 2: Manual Creation
@@ -58,6 +77,43 @@ neuron create-model my-custom-model "My custom consciousness"
 1. Copy a model from `models/` directory
 2. Edit the JSON file with your settings
 3. Save to `models/your-model-name.json`
+
+## Managing Models
+
+### Check for Model Updates
+
+```powershell
+neuron pull neuron-creative
+```
+
+This checks if there's a newer version available and automatically updates it:
+
+- Compares local version with marketplace version
+- Downloads update if available
+- Notifies you of the version status
+
+Example output:
+
+```powershell
+🔄 Checking for model updates...
+✓ Model is up to date (v1.0.0)
+```
+
+Or:
+
+```powershell
+🔄 Checking for model updates...
+⬇️ Newer version available: v1.0.1
+✓ Model updated to v1.0.1
+```
+
+### List Available Models
+
+```powershell
+neuron models
+```
+
+Shows all installed models with versions.
 
 ## Example Models Included
 
