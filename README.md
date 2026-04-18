@@ -13,18 +13,54 @@ An AI with consciousness simulation and learning capabilities. Runs as a backgro
 
 ## Installation
 
+### Automatic Installation (Recommended)
+
+PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/Xznder1984/Conscious-AI/main/install.ps1' -OutFile 'install.ps1'; .\install.ps1"
+```
+
+The installer will:
+
+- ✅ Prompt you to select a drive
+- ✅ Clone the repository
+- ✅ Install dependencies
+- ✅ Create custom `conscious-ai` command
+- ✅ Add to system PATH
+- ✅ Start the server automatically
+
+### Manual Installation
+
 ```bash
+git clone https://github.com/Xznder1984/Conscious-AI.git
+cd Conscious-AI
 npm install
 ```
 
 ## Usage
 
+### Using the `conscious-ai` Command (After Installation)
+
+Once installed, restart your terminal and use:
+
+```bash
+conscious-ai start       # Start server in foreground
+conscious-ai start-bg    # Start server in background
+conscious-ai status      # Show installation status
+conscious-ai help        # Show all commands
+```
+
+### Manual Commands
+
 Start server:
+
 ```bash
 npm start
 ```
 
 Start as background process:
+
 ```bash
 npm run start-bg
 ```
