@@ -240,6 +240,51 @@ app.get('/v1/state', (req, res) => {
   });
 });
 
+// Get available models endpoint
+app.get('/v1/models', (req, res) => {
+  const modelsPath = path.join(__dirname, '..', 'models');
+  try {
+    const modelFiles = fs.readdirSync(modelsPath).filter(f => f.endsWith('.json'));
+    const models = modelFiles.map(file => {
+      const modelData = JSON.parse(fs.readFileSync(path.join(modelsPath, file), 'utf8'));
+      return {
+        id: path.basename(file, '.json'),
+        ...modelData
+      };
+    });
+    res.json({ models });
+  } catch (error) {
+    res.json({ models: [], error: error.message });
+  }
+});
+
+// Download/Copy model endpoint
+app.post('/v1/download-model', (req, res) => {
+  const { modelName } = req.body;
+  
+  if (!modelName) {
+    return res.status(400).json({ error: 'Model name is required' });
+  }
+  
+  const modelsPath = path.join(__dirname, '..', 'models');
+  const modelPath = path.join(modelsPath, `${modelName}.json`);
+  
+  try {
+    if (fs.existsSync(modelPath)) {
+      const modelData = fs.readFileSync(modelPath, 'utf8');
+      res.json({ 
+        success: true, 
+        model: JSON.parse(modelData),
+        message: `Model ${modelName} is ready for download`
+      });
+    } else {
+      res.status(404).json({ error: `Model ${modelName} not found` });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`AI Consciousness Server running on port ${PORT}`);

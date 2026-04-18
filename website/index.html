@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 Neuron - AI Model Marketplace</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">Neuron Models</span>
+            </div>
+            <div class="nav-links">
+                <a href="#models" class="nav-link">Models</a>
+                <a href="#guide" class="nav-link">Download Guide</a>
+                <a href="https://github.com/Xznder1984/Conscious-AI" class="nav-link" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1>🧠 Neuron AI Models</h1>
+            <p>Download consciousness models for your personal AI system</p>
+            <p class="hero-subtext">Create, customize, and deploy your own unrestricted AI personalities</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Filter Section -->
+        <section class="filters">
+            <div class="filter-group">
+                <input type="text" id="searchInput" placeholder="Search models..." class="search-box">
+                <div class="filter-tags">
+                    <button class="filter-tag active" data-filter="all">All</button>
+                    <button class="filter-tag" data-filter="official">Official</button>
+                    <button class="filter-tag" data-filter="community">Community</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Models Grid -->
+        <section id="models" class="models">
+            <div id="modelsContainer" class="models-grid">
+                <div class="loading">Loading models...</div>
+            </div>
+        </section>
+
+        <!-- Download Guide Section -->
+        <section id="guide" class="download-guide">
+            <h2>📥 How to Download & Install Models</h2>
+            
+            <div class="guide-steps">
+                <div class="guide-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Copy the Install Command</h3>
+                        <p>Click the download button on any model to copy the installation command.</p>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Open PowerShell as Admin</h3>
+                        <p>Press Windows+X and select "Windows PowerShell (Admin)" or search for it.</p>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Paste & Run Command</h3>
+                        <p>Paste the command and press Enter. The model will install automatically.</p>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Use Your Model</h3>
+                        <p>Start Neuron with <code>neuron start</code> and your new model is ready to use!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="modelCount">3</div>
+                <div class="stat-label">Models Available</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="downloadCount">1000+</div>
+                <div class="stat-label">Downloads</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Restrictions</div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>🧠 Neuron - Unrestricted AI for Everyone</p>
+            <p class="footer-links">
+                <a href="https://github.com/Xznder1984/Conscious-AI" target="_blank">GitHub</a> •
+                <a href="https://github.com/Xznder1984/Conscious-AI/blob/main/MODELS.md" target="_blank">Model Docs</a> •
+                <a href="https://github.com/Xznder1984/Conscious-AI/blob/main/QUICKSTART.md" target="_blank">Quick Start</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Model Modal -->
+    <div id="modelModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalBody" class="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

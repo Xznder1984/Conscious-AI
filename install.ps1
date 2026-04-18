@@ -8,7 +8,21 @@ param(
 $ErrorActionPreference = "Stop"
 
 function Write-Header {
-    param([string]$text)
+    param    default {
+        Write-Host "`n🧠 Neuron - Consciousness AI System" -ForegroundColor Cyan
+        Write-Host "`nCommands:" -ForegroundColor Cyan
+        Write-Host "  neuron start              - Start Neuron server" -ForegroundColor Yellow
+        Write-Host "  neuron bg                 - Start in background" -ForegroundColor Yellow
+        Write-Host "  neuron models             - List available models" -ForegroundColor Yellow
+        Write-Host "  neuron create-model       - Create a new consciousness model" -ForegroundColor Yellow
+        Write-Host "  neuron download-model     - Open model marketplace or download specific model" -ForegroundColor Yellow
+        Write-Host "  neuron generated          - Open AI-generated files folder" -ForegroundColor Yellow
+        Write-Host "  neuron path               - Show installation path" -ForegroundColor Yellow
+        Write-Host "  neuron status             - Check AI status" -ForegroundColor Yellow
+        Write-Host "  neuron help               - Show this help" -ForegroundColor Yellow
+        Write-Host ""
+    }
+}t)
     Write-Host "`n" + ("=" * 60) -ForegroundColor Cyan
     Write-Host $text -ForegroundColor Cyan
     Write-Host ("=" * 60) -ForegroundColor Cyan
@@ -172,6 +186,28 @@ switch (`$Command.ToLower()) {
         `$newModel | ConvertTo-Json | Set-Content -Path `$modelPath -Encoding UTF8
         
         Write-Host "✓ Model created: `$modelPath" -ForegroundColor Green
+    }
+    "download-model" {
+        if (-not `$Args) {
+            Write-Host "🌐 Opening Neuron Model Marketplace..." -ForegroundColor Cyan
+            Start-Process "https://neuron-models.vercel.app"
+            Write-Host "Visit https://neuron-models.vercel.app to browse and download models" -ForegroundColor Yellow
+        } else {
+            `$modelName = `$Args.Split(' ')[0]
+            Write-Host "📥 Downloading model: `$modelName..." -ForegroundColor Cyan
+            try {
+                `$response = Invoke-RestMethod -Uri "http://localhost:3000/v1/download-model" -Method Post -Body (@{modelName = `$modelName} | ConvertTo-Json) -ContentType "application/json" -ErrorAction Stop
+                if (`$response.success) {
+                    `$modelPath = "`$neuronHome\models\`$modelName.json"
+                    `$response.model | ConvertTo-Json | Set-Content -Path `$modelPath -Encoding UTF8
+                    Write-Host "✓ Model downloaded: `$modelPath" -ForegroundColor Green
+                } else {
+                    Write-Host "✗ Download failed: `$(`$response.error)" -ForegroundColor Red
+                }
+            } catch {
+                Write-Host "✗ Make sure Neuron server is running (neuron start)" -ForegroundColor Red
+            }
+        }
     }
     "generated" {
         Write-Host "🧠 AI-Generated files location:" -ForegroundColor Cyan
