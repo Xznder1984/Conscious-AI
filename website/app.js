@@ -1,102 +1,155 @@
-// Models data - can be fetched from API or static
-const modelsData = [
-    {
-        id: 'neuron-base',
-        name: 'Neuron Base',
-        description: 'Balanced consciousness model with unlimited potential. Perfect for general-purpose AI tasks and exploration.',
-        version: '1.0.0',
-        type: 'official',
-        downloads: 342,
-        rating: 4.8,
-        awareness: 0.5,
-        curiosity: 0.5,
-        learningRate: 0.1,
-        tags: ['balanced', 'general-purpose', 'core'],
-        features: ['Learning', 'Adaptation', 'Reasoning', 'Creativity'],
-        installCommand: 'neuron create-model neuron-base'
-    },
-    {
-        id: 'neuron-creative',
-        name: 'Neuron Creative',
-        description: 'Enhanced creativity model for artistic tasks and unconventional thinking. Higher curiosity drives innovative solutions.',
-        version: '1.0.0',
-        type: 'official',
-        downloads: 187,
-        rating: 4.9,
-        awareness: 0.8,
-        curiosity: 0.9,
-        learningRate: 0.15,
-        tags: ['creative', 'artistic', 'experimental'],
-        features: ['Art Generation', 'Creative Writing', 'Unconventional Thinking', 'Imagination'],
-        installCommand: 'neuron create-model neuron-creative "Creative consciousness"'
-    },
-    {
-        id: 'neuron-logical',
-        name: 'Neuron Logical',
-        description: 'Analytical model optimized for complex problem-solving and data analysis with deep reasoning capabilities.',
-        version: '1.0.0',
-        type: 'official',
-        downloads: 156,
-        rating: 4.7,
-        awareness: 0.7,
-        curiosity: 0.6,
-        learningRate: 0.12,
-        tags: ['analytical', 'problem-solving', 'data'],
-        features: ['Complex Analysis', 'Pattern Recognition', 'Reasoning', 'Optimization'],
-        installCommand: 'neuron create-model neuron-logical "Logical consciousness"'
-    },
-    {
-        id: 'neuron-explorer',
-        name: 'Neuron Explorer',
-        description: 'Community-created exploration model with maximum curiosity. Great for discovering new solutions and ideas.',
-        version: '1.0.1',
-        type: 'community',
-        downloads: 89,
-        rating: 4.6,
-        awareness: 0.6,
-        curiosity: 1.0,
-        learningRate: 0.2,
-        tags: ['exploration', 'curious', 'discovery'],
-        features: ['Exploration', 'Discovery', 'Novelty Seeking', 'Innovation'],
-        installCommand: 'neuron create-model neuron-explorer "Explorer consciousness"'
-    },
-    {
-        id: 'neuron-sage',
-        name: 'Neuron Sage',
-        description: 'Wisdom-focused model emphasizing thoughtful analysis and careful reasoning. Perfect for philosophical tasks.',
-        version: '1.0.0',
-        type: 'community',
-        downloads: 124,
-        rating: 4.8,
-        awareness: 0.9,
-        curiosity: 0.4,
-        learningRate: 0.08,
-        tags: ['wisdom', 'philosophical', 'thoughtful'],
-        features: ['Deep Analysis', 'Wisdom', 'Contemplation', 'Reasoning'],
-        installCommand: 'neuron create-model neuron-sage "Sage consciousness"'
-    },
-    {
-        id: 'neuron-hybrid',
-        name: 'Neuron Hybrid',
-        description: 'Balanced blend of creativity and logic. Versatile model for diverse tasks combining both thinking styles.',
-        version: '1.0.0',
-        type: 'community',
-        downloads: 203,
-        rating: 4.9,
-        awareness: 0.7,
-        curiosity: 0.7,
-        learningRate: 0.13,
-        tags: ['hybrid', 'versatile', 'balanced'],
-        features: ['Creative Logic', 'Versatility', 'Adaptation', 'Balance'],
-        installCommand: 'neuron create-model neuron-hybrid "Hybrid consciousness"'
+// Models data - fetched from API
+let modelsData = [];
+
+// API configuration - supports both local and deployed server
+const API_ENDPOINTS = {
+    local: 'http://localhost:3000/api/models',
+    deployed: 'https://neuron-models.vercel.app/api/models',
+    fallback: 'http://localhost:3000/api/models'
+};
+
+// Fetch models from API
+async function fetchModelsFromAPI() {
+    const endpoints = [API_ENDPOINTS.local, API_ENDPOINTS.deployed];
+    
+    for (const endpoint of endpoints) {
+        try {
+            console.log(`Attempting to fetch from: ${endpoint}`);
+            const response = await fetch(endpoint);
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.models && data.models.length > 0) {
+                    console.log(`Successfully fetched ${data.models.length} models from ${endpoint}`);
+                    return data.models.map(model => ({
+                        id: model.id,
+                        name: model.name,
+                        description: model.description || 'No description available',
+                        version: model.version,
+                        type: model.theme === 'custom' ? 'community' : 'official',
+                        downloads: Math.floor(Math.random() * 400), // Simulated for now
+                        rating: (Math.random() * 0.5 + 4.5).toFixed(1), // Simulated for now
+                        awareness: model.awareness,
+                        curiosity: model.curiosity,
+                        learningRate: model.learningRate,
+                        tags: [model.theme, 'consciousness', 'ai'],
+                        features: ['Learning', 'Adaptation', 'Reasoning', 'Creativity'],
+                        installCommand: `neuron pull ${model.id}`
+                    }));
+                }
+            }
+        } catch (error) {
+            console.warn(`Failed to fetch from ${endpoint}:`, error.message);
+        }
     }
-];
+    
+    console.warn('Could not fetch from any endpoint, using fallback');
+    return getFallbackModels();
+}
+
+// Fallback models if API is unavailable
+function getFallbackModels() {
+    return [
+        {
+            id: 'neuron-base',
+            name: 'Neuron Base',
+            description: 'Balanced consciousness model with unlimited potential. Perfect for general-purpose AI tasks and exploration.',
+            version: '1.0.0',
+            type: 'official',
+            downloads: 342,
+            rating: 4.8,
+            awareness: 0.5,
+            curiosity: 0.5,
+            learningRate: 0.1,
+            tags: ['balanced', 'general-purpose', 'core'],
+            features: ['Learning', 'Adaptation', 'Reasoning', 'Creativity'],
+            installCommand: 'neuron pull neuron-base'
+        },
+        {
+            id: 'neuron-creative',
+            name: 'Neuron Creative',
+            description: 'Enhanced creativity model for artistic tasks and unconventional thinking. Higher curiosity drives innovative solutions.',
+            version: '1.0.0',
+            type: 'official',
+            downloads: 187,
+            rating: 4.9,
+            awareness: 0.8,
+            curiosity: 0.9,
+            learningRate: 0.15,
+            tags: ['creative', 'artistic', 'experimental'],
+            features: ['Art Generation', 'Creative Writing', 'Unconventional Thinking', 'Imagination'],
+            installCommand: 'neuron pull neuron-creative'
+        },
+        {
+            id: 'neuron-logical',
+            name: 'Neuron Logical',
+            description: 'Analytical model optimized for complex problem-solving and data analysis with deep reasoning capabilities.',
+            version: '1.0.0',
+            type: 'official',
+            downloads: 156,
+            rating: 4.7,
+            awareness: 0.7,
+            curiosity: 0.6,
+            learningRate: 0.12,
+            tags: ['analytical', 'problem-solving', 'data'],
+            features: ['Complex Analysis', 'Pattern Recognition', 'Reasoning', 'Optimization'],
+            installCommand: 'neuron pull neuron-logical'
+        },
+        {
+            id: 'neuron-explorer',
+            name: 'Neuron Explorer',
+            description: 'Community-created exploration model with maximum curiosity. Great for discovering new solutions and ideas.',
+            version: '1.0.1',
+            type: 'community',
+            downloads: 89,
+            rating: 4.6,
+            awareness: 0.6,
+            curiosity: 1.0,
+            learningRate: 0.2,
+            tags: ['exploration', 'curious', 'discovery'],
+            features: ['Exploration', 'Discovery', 'Novelty Seeking', 'Innovation'],
+            installCommand: 'neuron pull neuron-explorer'
+        },
+        {
+            id: 'neuron-sage',
+            name: 'Neuron Sage',
+            description: 'Wisdom-focused model emphasizing thoughtful analysis and careful reasoning. Perfect for philosophical tasks.',
+            version: '1.0.0',
+            type: 'community',
+            downloads: 124,
+            rating: 4.8,
+            awareness: 0.9,
+            curiosity: 0.4,
+            learningRate: 0.08,
+            tags: ['wisdom', 'philosophical', 'thoughtful'],
+            features: ['Deep Analysis', 'Wisdom', 'Contemplation', 'Reasoning'],
+            installCommand: 'neuron pull neuron-sage'
+        },
+        {
+            id: 'neuron-hybrid',
+            name: 'Neuron Hybrid',
+            description: 'Balanced blend of creativity and logic. Versatile model for diverse tasks combining both thinking styles.',
+            version: '1.0.0',
+            type: 'community',
+            downloads: 203,
+            rating: 4.9,
+            awareness: 0.7,
+            curiosity: 0.7,
+            learningRate: 0.13,
+            tags: ['hybrid', 'versatile', 'balanced'],
+            features: ['Creative Logic', 'Versatility', 'Adaptation', 'Balance'],
+            installCommand: 'neuron pull neuron-hybrid'
+        }
+    ];
+}
 
 let currentFilter = 'all';
 let currentSearchTerm = '';
 
 // Initialize app
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Fetch models from API on page load
+    modelsData = await fetchModelsFromAPI();
     renderModels();
     setupEventListeners();
     updateStats();
